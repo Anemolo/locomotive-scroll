@@ -170,25 +170,26 @@ function _nonIterableSpread() {
 var defaults = {
   el: document,
   elMobile: document,
-  name: 'scroll',
+  name: "scroll",
   offset: [0, 0],
   repeat: false,
   smooth: false,
   smoothMobile: false,
-  direction: 'vertical',
+  direction: "vertical",
   lerp: 0.1,
-  "class": 'is-inview',
-  scrollbarClass: 'c-scrollbar',
-  scrollingClass: 'has-scroll-scrolling',
-  draggingClass: 'has-scroll-dragging',
-  smoothClass: 'has-scroll-smooth',
-  initClass: 'has-scroll-init',
+  "class": "is-inview",
+  scrollbarClass: "c-scrollbar",
+  scrollingClass: "has-scroll-scrolling",
+  draggingClass: "has-scroll-dragging",
+  smoothClass: "has-scroll-smooth",
+  initClass: "has-scroll-init",
   getSpeed: false,
   getDirection: false,
   multiplier: 1,
   firefoxMultiplier: 50,
   touchMultiplier: 2,
-  scrollFromAnywhere: false
+  scrollFromAnywhere: false,
+  disableRaf: false
 };
 
 var _default = /*#__PURE__*/function () {
@@ -879,8 +880,40 @@ var smoothscroll = createCommonjsModule(function (module, exports) {
 });
 var smoothscroll_1 = smoothscroll.polyfill;
 
+function _createSuper(Derived) {
+  function isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  return function () {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (isNativeReflectConstruct()) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
 var _default$1 = /*#__PURE__*/function (_Core) {
   _inherits(_default, _Core);
+
+  var _super = _createSuper(_default);
 
   function _default() {
     var _this;
@@ -889,7 +922,7 @@ var _default$1 = /*#__PURE__*/function (_Core) {
 
     _classCallCheck(this, _default);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(_default).call(this, options));
+    _this = _super.call(this, options);
     window.addEventListener('scroll', _this.checkScroll, false);
     smoothscroll.polyfill();
     return _this;
@@ -1796,6 +1829,35 @@ var src$1 = function bezier (mX1, mY1, mX2, mY2) {
   };
 };
 
+function _createSuper$1(Derived) {
+  function isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  return function () {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (isNativeReflectConstruct()) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
 var keyCodes$1 = {
   LEFT: 37,
   UP: 38,
@@ -1812,6 +1874,8 @@ var keyCodes$1 = {
 var _default$2 = /*#__PURE__*/function (_Core) {
   _inherits(_default, _Core);
 
+  var _super = _createSuper$1(_default);
+
   function _default() {
     var _this;
 
@@ -1820,8 +1884,8 @@ var _default$2 = /*#__PURE__*/function (_Core) {
     _classCallCheck(this, _default);
 
     window.scrollTo(0, 0);
-    history.scrollRestoration = 'manual';
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(_default).call(this, options));
+    history.scrollRestoration = "manual";
+    _this = _super.call(this, options);
     if (_this.inertia) _this.lerp = _this.inertia * 0.1;
     _this.isScrolling = false;
     _this.isDraggingScrollbar = false;
@@ -1830,7 +1894,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
     _this.parallaxElements = [];
     _this.stop = false;
     _this.checkKey = _this.checkKey.bind(_assertThisInitialized(_this));
-    window.addEventListener('keydown', _this.checkKey, false);
+    window.addEventListener("keydown", _this.checkKey, false);
     return _this;
   }
 
@@ -1848,7 +1912,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       }, this.instance);
       this.vs = new src({
         el: this.scrollFromAnywhere ? document : this.el,
-        mouseMultiplier: navigator.platform.indexOf('Win') > -1 ? 1 : 0.4,
+        mouseMultiplier: navigator.platform.indexOf("Win") > -1 ? 1 : 0.4,
         firefoxMultiplier: this.firefoxMultiplier,
         touchMultiplier: this.touchMultiplier,
         useKeyboard: false,
@@ -1987,16 +2051,17 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       var _this4 = this;
 
       var forced = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      var updateScroll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       if (forced || this.isScrolling || this.isDraggingScrollbar) {
-        if (!this.hasScrollTicking) {
+        if (!this.hasScrollTicking && !this.disableRaf) {
           requestAnimationFrame(function () {
             return _this4.checkScroll();
           });
           this.hasScrollTicking = true;
         }
 
-        this.updateScroll();
+        if (updateScroll) this.updateScroll();
         var distance = Math.abs(this.instance.delta.y - this.instance.scroll.y);
 
         if (!this.animatingScroll && (distance < 0.5 && this.instance.delta.y != 0 || distance < 0.5 && this.instance.delta.y == 0)) {
@@ -2010,14 +2075,14 @@ var _default$2 = /*#__PURE__*/function (_Core) {
             if (!this.sections[i].inView) {
               this.sections[i].inView = true;
               this.sections[i].el.style.opacity = 1;
-              this.sections[i].el.style.pointerEvents = 'all';
-              this.sections[i].el.setAttribute("data-".concat(this.name, "-section-inview"), '');
+              this.sections[i].el.style.pointerEvents = "all";
+              this.sections[i].el.setAttribute("data-".concat(this.name, "-section-inview"), "");
             }
           } else {
             if (this.sections[i].inView) {
               this.sections[i].inView = false;
               this.sections[i].el.style.opacity = 0;
-              this.sections[i].el.style.pointerEvents = 'none';
+              this.sections[i].el.style.pointerEvents = "none";
               this.sections[i].el.removeAttribute("data-".concat(this.name, "-section-inview"));
             }
 
@@ -2077,12 +2142,12 @@ var _default$2 = /*#__PURE__*/function (_Core) {
     key: "addDirection",
     value: function addDirection() {
       if (this.instance.delta.y > this.instance.scroll.y) {
-        if (this.instance.direction !== 'down') {
-          this.instance.direction = 'down';
+        if (this.instance.direction !== "down") {
+          this.instance.direction = "down";
         }
       } else if (this.instance.delta.y < this.instance.scroll.y) {
-        if (this.instance.direction !== 'up') {
-          this.instance.direction = 'up';
+        if (this.instance.direction !== "up") {
+          this.instance.direction = "up";
         }
       }
     }
@@ -2098,8 +2163,8 @@ var _default$2 = /*#__PURE__*/function (_Core) {
   }, {
     key: "initScrollBar",
     value: function initScrollBar() {
-      this.scrollbar = document.createElement('span');
-      this.scrollbarThumb = document.createElement('span');
+      this.scrollbar = document.createElement("span");
+      this.scrollbarThumb = document.createElement("span");
       this.scrollbar.classList.add("".concat(this.scrollbarClass));
       this.scrollbarThumb.classList.add("".concat(this.scrollbarClass, "_thumb"));
       this.scrollbar.append(this.scrollbarThumb);
@@ -2108,9 +2173,9 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       this.getScrollBar = this.getScrollBar.bind(this);
       this.releaseScrollBar = this.releaseScrollBar.bind(this);
       this.moveScrollBar = this.moveScrollBar.bind(this);
-      this.scrollbarThumb.addEventListener('mousedown', this.getScrollBar);
-      window.addEventListener('mouseup', this.releaseScrollBar);
-      window.addEventListener('mousemove', this.moveScrollBar); // Set scrollbar values
+      this.scrollbarThumb.addEventListener("mousedown", this.getScrollBar);
+      window.addEventListener("mouseup", this.releaseScrollBar);
+      window.addEventListener("mousemove", this.moveScrollBar); // Set scrollbar values
 
       if (this.instance.limit + this.windowHeight <= this.windowHeight) {
         return;
@@ -2134,9 +2199,9 @@ var _default$2 = /*#__PURE__*/function (_Core) {
   }, {
     key: "destroyScrollBar",
     value: function destroyScrollBar() {
-      this.scrollbarThumb.removeEventListener('mousedown', this.getScrollBar);
-      window.removeEventListener('mouseup', this.releaseScrollBar);
-      window.removeEventListener('mousemove', this.moveScrollBar);
+      this.scrollbarThumb.removeEventListener("mousedown", this.getScrollBar);
+      window.removeEventListener("mouseup", this.releaseScrollBar);
+      window.removeEventListener("mousemove", this.moveScrollBar);
       this.scrollbar.remove();
     }
   }, {
@@ -2183,17 +2248,17 @@ var _default$2 = /*#__PURE__*/function (_Core) {
         var els = _this6.sections[y].el.querySelectorAll("[data-".concat(_this6.name, "]"));
 
         els.forEach(function (el, id) {
-          var cl = el.dataset[_this6.name + 'Class'] || _this6["class"];
+          var cl = el.dataset[_this6.name + "Class"] || _this6["class"];
           var top;
-          var repeat = el.dataset[_this6.name + 'Repeat'];
-          var call = el.dataset[_this6.name + 'Call'];
-          var position = el.dataset[_this6.name + 'Position'];
-          var delay = el.dataset[_this6.name + 'Delay'];
-          var direction = el.dataset[_this6.name + 'Direction'];
-          var sticky = typeof el.dataset[_this6.name + 'Sticky'] === 'string';
-          var speed = el.dataset[_this6.name + 'Speed'] ? parseFloat(el.dataset[_this6.name + 'Speed']) / 10 : false;
-          var offset = typeof el.dataset[_this6.name + 'Offset'] === 'string' ? el.dataset[_this6.name + 'Offset'].split(',') : _this6.offset;
-          var target = el.dataset[_this6.name + 'Target'];
+          var repeat = el.dataset[_this6.name + "Repeat"];
+          var call = el.dataset[_this6.name + "Call"];
+          var position = el.dataset[_this6.name + "Position"];
+          var delay = el.dataset[_this6.name + "Delay"];
+          var direction = el.dataset[_this6.name + "Direction"];
+          var sticky = typeof el.dataset[_this6.name + "Sticky"] === "string";
+          var speed = el.dataset[_this6.name + "Speed"] ? parseFloat(el.dataset[_this6.name + "Speed"]) / 10 : false;
+          var offset = typeof el.dataset[_this6.name + "Offset"] === "string" ? el.dataset[_this6.name + "Offset"].split(",") : _this6.offset;
+          var target = el.dataset[_this6.name + "Target"];
           var targetEl;
 
           if (target !== undefined) {
@@ -2219,7 +2284,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
             middle = (bottom - top) / 2 + top;
           }
 
-          if (repeat == 'false') {
+          if (repeat == "false") {
             repeat = false;
           } else if (repeat != undefined) {
             repeat = true;
@@ -2231,9 +2296,9 @@ var _default$2 = /*#__PURE__*/function (_Core) {
 
           if (offset) {
             for (var i = 0; i < offset.length; i++) {
-              if (typeof offset[i] == 'string') {
-                if (offset[i].includes('%')) {
-                  relativeOffset[i] = parseInt(offset[i].replace('%', '') * _this6.windowHeight / 100);
+              if (typeof offset[i] == "string") {
+                if (offset[i].includes("%")) {
+                  relativeOffset[i] = parseInt(offset[i].replace("%", "") * _this6.windowHeight / 100);
                 } else {
                   relativeOffset[i] = parseInt(offset[i]);
                 }
@@ -2285,7 +2350,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       sections.forEach(function (section, i) {
         var offset = section.getBoundingClientRect().top - window.innerHeight * 1.5 - getTranslate(section).y;
         var limit = offset + section.getBoundingClientRect().height + window.innerHeight * 2;
-        var persistent = typeof section.dataset[_this7.name + 'Persistent'] === 'string';
+        var persistent = typeof section.dataset[_this7.name + "Persistent"] === "string";
         var mappedSection = {
           el: section,
           offset: offset,
@@ -2331,15 +2396,15 @@ var _default$2 = /*#__PURE__*/function (_Core) {
 
         if (current.inView || setAllElements) {
           switch (current.position) {
-            case 'top':
+            case "top":
               transformDistance = _this8.instance.scroll.y * -current.speed;
               break;
 
-            case 'elementTop':
+            case "elementTop":
               transformDistance = (scrollBottom - current.top) * -current.speed;
               break;
 
-            case 'bottom':
+            case "bottom":
               transformDistance = (_this8.instance.limit - scrollBottom + _this8.windowHeight) * current.speed;
               break;
 
@@ -2364,7 +2429,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
         }
 
         if (transformDistance !== false) {
-          if (current.direction === 'horizontal') {
+          if (current.direction === "horizontal") {
             _this8.transform(current.el, transformDistance, 0, isForced ? false : current.delay);
           } else {
             _this8.transform(current.el, 0, transformDistance, isForced ? false : current.delay);
@@ -2389,7 +2454,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       var _this9 = this;
 
       var duration = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1000;
-      var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [0.25, 0.00, 0.35, 1.00];
+      var easing = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [0.25, 0.0, 0.35, 1.0];
       var disableLerp = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
       var callback = arguments.length > 5 ? arguments[5] : undefined;
       // TODO - In next breaking update, use an object as 2nd parameter for options (offset, duration, easing, disableLerp, callback)
@@ -2397,11 +2462,11 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       var offset = offsetOption ? parseInt(offsetOption) : 0;
       easing = src$1.apply(void 0, _toConsumableArray(easing));
 
-      if (typeof targetOption === 'string') {
+      if (typeof targetOption === "string") {
         // Selector or boundaries
-        if (targetOption === 'top') {
+        if (targetOption === "top") {
           target = 0;
-        } else if (targetOption === 'bottom') {
+        } else if (targetOption === "bottom") {
           target = this.instance.limit;
         } else {
           target = document.querySelector(targetOption); // If the query fails, abort
@@ -2410,19 +2475,19 @@ var _default$2 = /*#__PURE__*/function (_Core) {
             return;
           }
         }
-      } else if (typeof targetOption === 'number') {
+      } else if (typeof targetOption === "number") {
         // Absolute coordinate
         target = parseInt(targetOption);
       } else if (targetOption && targetOption.tagName) {
         // DOM Element
         target = targetOption;
       } else {
-        console.warn('`targetOption` parameter is not valid');
+        console.warn("`targetOption` parameter is not valid");
         return;
       } // We have a target that is not a coordinate yet, get it
 
 
-      if (typeof target !== 'number') {
+      if (typeof target !== "number") {
         // Verify the given target belongs to this scroll scope
         var targetInScope = getParents(target).includes(this.el);
 
@@ -2517,7 +2582,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
   }, {
     key: "setScroll",
     value: function setScroll(x, y) {
-      this.instance = _objectSpread2({}, this.instance, {
+      this.instance = _objectSpread2(_objectSpread2({}, this.instance), {}, {
         scroll: {
           x: x,
           y: y
@@ -2538,7 +2603,7 @@ var _default$2 = /*#__PURE__*/function (_Core) {
       this.html.classList.remove(this.smoothClass);
       this.vs.destroy();
       this.destroyScrollBar();
-      window.removeEventListener('keydown', this.checkKey, false);
+      window.removeEventListener("keydown", this.checkKey, false);
     }
   }]);
 
